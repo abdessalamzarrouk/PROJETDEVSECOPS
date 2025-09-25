@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <div th:replace="fragments/layout :: common_head('Liste des Bordereaux')"></div>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex flex-col">
+
+<div class="flex flex-grow">
+    <aside th:replace="fragments/layout :: sidebar('bordereaux', ${connectedUserFullName})"></aside>
+
+    <main class="flex-1 p-4">
+        <div class="container mx-auto p-6 bg-white rounded-lg shadow-xl mt-8">
+            <div th:replace="fragments/layout :: main_content_header('Gestion des Bordereaux', ${connectedUserFullName})"></div>
+
+            <div th:replace="fragments/layout :: alert_messages(${success}, ${error})"></div>
+
+            <div class="bg-white p-6 rounded-lg shadow overflow-x-auto">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Code Bordereau
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Type
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Montant Global
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Nombre d'Articles
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Date d'Émission
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Date PEC Bord.
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Validé par
+                        </th> <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Statut
+                    </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Poste Comptable (Via 1er Article)
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Fonctionnaire Emetteur (Si renseigné)
+                        </th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="bordereau : ${bordereaux}">
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${bordereau.codeBordereau}">B001</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${bordereau.typeBordereau}">Type</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${#numbers.formatDecimal(bordereau.montantGlobal, 0, 'COMMA', 2, 'POINT')} + ' DH'">0,00 DH</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${bordereau.articlesRecette != null ? bordereau.articlesRecette.size() : 0}">0</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm" th:text="${#temporals.format(bordereau.dateEmission, 'dd-MM-yyyy')}">01-01-2023</td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span th:if="${bordereau.datePecBord != null}" th:text="${#temporals.format(bordereau.datePecBord, 'dd-MM-yyyy')}"></span>
+                            <span th:unless="${bordereau.datePecBord != null}">N/A</span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span th:if="${bordereau.fonctionnairePec != null}"
+                                  th:text="${bordereau.fonctionnairePec.prenomPersonne + ' ' + bordereau.fonctionnairePec.nomPersonne}"></span>
+                            <span th:unless="${bordereau.fonctionnairePec != null}">Non validé</span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <span class="status-badge"
+                                      th:classappend="'status-' + ${bordereau.status}"
+                                      th:text="${bordereau.status}">STATUT</span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <span th:if="${not #lists.isEmpty(bordereau.articlesRecette) and bordereau.articlesRecette[0].posteComptable != null}"
+                                      th:text="${bordereau.articlesRecette[0].posteComptable.intitulePoste}"></span>
+                            <span th:unless="${not #lists.isEmpty(bordereau.articlesRecette) and bordereau.articlesRecette[0].posteComptable != null}">N/A</span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span th:if="${bordereau.agentEmetteur != null}"
+                                  th:text="${bordereau.agentEmetteur.nomPersonne + ' ' + bordereau.agentEmetteur.prenomPersonne}"></span>
+                            <span th:unless="${bordereau.agentEmetteur != null}">N/A</span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <a th:href="@{/bordereaux/{codeBordereau}(codeBordereau=${bordereau.codeBordereau})}" class="text-blue-600 hover:text-blue-800 font-semibold mr-3">Détails</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(bordereaux)}">
+                        <td colspan="11" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                            Aucun bordereau trouvé.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

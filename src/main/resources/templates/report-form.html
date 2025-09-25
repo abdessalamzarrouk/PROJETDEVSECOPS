@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Essentiel pour que min-h-screen fonctionne correctement sur le corps */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom styles for date input focus if needed, though Tailwind's ring classes are often sufficient */
+        input[type="date"]:focus {
+            outline: none;
+            /* You can uncomment or adjust these if Tailwind's default focus styles aren't enough */
+            /* box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); */
+            /* border-color: #3b82f6; */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex flex-col">
+
+<div class="flex flex-grow">
+    <aside class="w-64 bg-gray-900 text-gray-200 flex-shrink-0 h-full sticky top-0 overflow-y-auto">
+
+        <div class="w-full h-25 overflow-hidden flex items-center justify-center">
+            <img th:src="@{/images/TGR-LOGO2.svg}" alt="Your Logo" class="w-full h-full object-cover">
+        </div>
+
+        <div class="p-6">
+            <nav>
+                <ul>
+                    <li class="mb-2">
+                        <a th:href="@{/comptable/dashboard}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 bg-gray-700 hover:text-white">Tableau de bord</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/bordereaux}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Bordereaux</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/articles-recette}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Articles de Recette</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/operations-recette}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Opérations de Recette</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/rubriques-budgetaires}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Rubriques Budgétaires</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/reports}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Rapports</a>
+                    </li>
+                    <li class="my-4 border-t border-gray-700"></li>
+                    <li class="mb-2">
+                        <a th:href="@{/profile}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white text-white">Profil</a> </li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="w-full">
+                            <button type="submit" class="block w-full text-left py-2 px-4 rounded transition duration-200 hover:bg-red-700 hover:text-white text-red-300">
+                                Déconnexion
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="p-6 text-center text-sm text-gray-400 border-t border-gray-700 mt-4">
+            Connecté en tant que: <br>
+            <strong th:text="${connectedUserFullName ?: 'Invité'}" class="text-white"></strong>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4">
+        <div class="container mx-auto p-6 bg-white rounded-lg shadow-xl mt-8">
+
+            <div class="bg-white p-6 rounded-lg shadow-xl mt-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Générer Rapport des Opérations de Recette</h2>
+
+                <form action="/reports/operations-recette" method="GET" class="space-y-6 max-w-md mx-auto">
+                    <div>
+                        <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Date de début:</label>
+                        <input
+                                type="date"
+                                id="startDate"
+                                name="startDate"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                required
+                        />
+                    </div>
+
+                    <div>
+                        <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">Date de fin:</label>
+                        <input
+                                type="date"
+                                id="endDate"
+                                name="endDate"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                required
+                        />
+                    </div>
+
+                    <div class="flex justify-center">
+                        <button
+                                type="submit"
+                                class="w-full sm:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            Générer le Rapport PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

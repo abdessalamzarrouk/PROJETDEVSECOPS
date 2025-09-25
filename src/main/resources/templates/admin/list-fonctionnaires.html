@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Fonctionnaires</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .card {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar-active-item {
+      background-color: #4a5568;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex flex-col">
+
+<div class="flex flex-grow">
+  <aside class="w-64 bg-gray-900 text-gray-200 flex-shrink-0 h-full sticky top-0 overflow-y-auto">
+    <div class="w-full h-25 overflow-hidden flex items-center justify-center">
+      <img th:src="@{/images/TGR-LOGO2.svg}" alt="Your Logo" class="w-full h-full object-cover">
+    </div>
+    <div class="p-6">
+      <nav>
+        <ul>
+          <li class="mb-2" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/dashboard}"
+               th:classappend="${activeMenuItem == 'admin_dashboard' ? 'sidebar-active-item' : 'hover:bg-gray-700 hover:text-white'}"
+               class="block py-2 px-4 rounded transition duration-200">Tableau de bord Admin</a>
+          </li>
+          <li class="mb-2" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/users}"
+               th:classappend="${activeMenuItem == 'admin_users' ? 'sidebar-active-item' : 'hover:bg-gray-700 hover:text-white'}"
+               class="block py-2 px-4 rounded transition duration-200">Gestion des Utilisateurs</a>
+          </li>
+          <li class="mb-2" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/fonctionnaires}"
+               th:classappend="${activeMenuItem == 'admin_fonctionnaires' ? 'sidebar-active-item' : 'hover:bg-gray-700 hover:text-white'}"
+               class="block py-2 px-4 rounded transition duration-200">Gestion des Fonctionnaires</a>
+          </li>
+          <li class="mb-2" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/postes-comptables}"
+               th:classappend="${activeMenuItem == 'admin_postes_comptables' ? 'sidebar-active-item' : 'hover:bg-gray-700 hover:text-white'}"
+               class="block py-2 px-4 rounded transition duration-200">Gestion des Postes Comptables</a>
+          </li>
+          <li class="mb-2" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/rubriques-budgetaires}"
+               th:classappend="${activeMenuItem == 'admin_rubriques_budgetaires' ? 'sidebar-active-item' : 'hover:bg-gray-700 hover:text-white'}"
+               class="block py-2 px-4 rounded transition duration-200">Gestion des Rubriques Budgétaires</a>
+          </li>
+          <li class="my-4 border-t border-gray-700"></li>
+          <li>
+            <form th:action="@{/logout}" method="post" class="w-full">
+              <button type="submit" class="block w-full text-left py-2 px-4 rounded transition duration-200 hover:bg-red-700 text-red-300">
+                Déconnexion
+              </button>
+            </form>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="p-6 text-center text-sm text-gray-400 border-t border-gray-700 mt-4">
+      Connecté en tant que: <br>
+      <strong th:text="${connectedUserFullName ?: 'Invité'}" class="text-white"></strong>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-4">
+    <div class="container mx-auto p-6 bg-white rounded-lg shadow-xl mt-8">
+      <div class="flex justify-between items-center mb-6 border-b pb-4">
+        <h1 class="text-3xl font-bold text-gray-800">Liste des Fonctionnaires</h1>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-600">Connecté en tant que : <strong th:text="${connectedUserFullName ?: 'Admin'}" class="text-indigo-600"></strong></span>
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+              Déconnexion
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div th:if="${successMessage}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline" th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline" th:text="${errorMessage}"></span>
+      </div>
+
+      <div class="mb-6 flex justify-end">
+        <a th:href="@{/admin/fonctionnaires/add}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-200">Ajouter un Fonctionnaire</a>
+      </div>
+
+      <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="py-3 px-6">ID</th>
+            <th scope="col" class="py-3 px-6">Nom</th>
+            <th scope="col" class="py-3 px-6">Prénom</th>
+            <th scope="col" class="py-3 px-6">Date Début Service</th>
+            <th scope="col" class="py-3 px-6">Date Fin Service</th>
+            <th scope="col" class="py-3 px-6">Fonctions</th>
+            <th scope="col" class="py-3 px-6">Poste Comptable</th>
+            <th scope="col" class="py-3 px-6">Utilisateur Lié</th>
+            <th scope="col" class="py-3 px-6">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+              th:each="fonctionnaire : ${fonctionnaires}">
+            <td class="py-4 px-6" th:text="${fonctionnaire.id}">1</td>
+            <td class="py-4 px-6" th:text="${fonctionnaire.nomPersonne}">Nom</td>
+            <td class="py-4 px-6" th:text="${fonctionnaire.prenomPersonne}">Prénom</td>
+            <td class="py-4 px-6" th:text="${fonctionnaire.dateDebutService != null ? #temporals.format(fonctionnaire.dateDebutService, 'dd-MM-yyyy') : 'N/A'}">01-01-2020</td>
+            <td class="py-4 px-6" th:text="${fonctionnaire.dateFinService != null ? #temporals.format(fonctionnaire.dateFinService, 'dd-MM-yyyy') : 'N/A'}">31-12-2025</td>
+            <td class="py-4 px-6">
+              <span th:each="fonction, iterStat : ${fonctionnaire.fonctions}" th:text="${fonction} + (${iterStat.last} ? '' : ', ')"></span>
+              <span th:if="${fonctionnaire.fonctions.isEmpty()}">N/A</span>
+            </td>
+            <td class="py-4 px-6" th:text="${fonctionnaire.posteComptable != null ? fonctionnaire.posteComptable.codePoste + ' - ' + fonctionnaire.posteComptable.intitulePoste : 'N/A'}">PC001</td>
+            <td class="py-4 px-6" th:text="${fonctionnaire.utilisateur != null ? fonctionnaire.utilisateur.nomUtilisateur : 'Non lié'}">user123</td>
+            <td class="py-4 px-6 flex space-x-2">
+              <a th:href="@{/admin/fonctionnaires/edit/{id}(id=${fonctionnaire.id})}"
+                 class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Modifier</a>
+              <a th:href="@{/admin/fonctionnaires/delete/{id}(id=${fonctionnaire.id})}"
+                 onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce fonctionnaire ?');"
+                 class="font-medium text-red-600 dark:text-red-500 hover:underline">Supprimer</a>
+            </td>
+          </tr>
+          <tr th:if="${fonctionnaires.empty}">
+            <td colspan="9" class="py-4 px-6 text-center text-gray-500">Aucun fonctionnaire trouvé.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

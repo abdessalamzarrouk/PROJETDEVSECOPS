@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Utilisateur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* No image filter styles needed as you already handled that */
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex flex-col">
+
+<div class="flex flex-grow">
+    <aside class="w-64 bg-gray-900 text-gray-200 flex-shrink-0 h-full sticky top-0 overflow-y-auto">
+
+        <div class="w-full h-25 overflow-hidden flex items-center justify-center">
+            <img th:src="@{/images/TGR-LOGO2.svg}" alt="Your Logo" class="w-full h-full object-cover">
+        </div>
+
+        <div class="p-6">
+            <nav>
+                <ul>
+                    <li class="mb-2">
+                        <a th:href="@{/comptable/dashboard}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Tableau de bord</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/bordereaux}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Bordereaux</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/articles-recette}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Articles de Recette</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/operations-recette}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Opérations de Recette</a>
+                    </li>
+                    <li class="mb-2">
+                        <a th:href="@{/rubriques-budgetaires}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Rubriques Budgétaires</a>
+                    </li>
+                    <li class="my-4 border-t border-gray-700"></li>
+                    <li class="mb-2">
+                        <a th:href="@{/profile}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white bg-gray-700 text-white">Profil</a> </li>
+                    <li class="mb-2">
+                        <a th:href="@{/settings}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">Paramètres</a>
+                    </li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="w-full">
+                            <button type="submit" class="block w-full text-left py-2 px-4 rounded transition duration-200 hover:bg-red-700 hover:text-white text-red-300">
+                                Déconnexion
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4">
+        <div class="container mx-auto p-6 bg-white rounded-lg shadow-xl mt-8">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h1 class="text-3xl font-bold text-gray-800">Votre Profil</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Connecté en tant que :  <strong th:text="${connectedUserFullName ?: 'Invité'}" class="text-indigo-600"></strong></span>                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                            Déconnexion
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <form th:action="@{/profile}" th:object="${currentUser}" method="post">
+                <input type="hidden" th:field="*{idUtilisateur}" /> <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Détails du Compte</h3>
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Nom d'utilisateur :</label>
+                        <input type="text" id="username" th:field="*{nomUtilisateur}" readonly
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200 cursor-not-allowed"/>
+                        <p class="text-xs text-gray-500 mt-1">Le nom d'utilisateur ne peut pas être modifié.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email :</label>
+                        <input type="email" id="email" th:field="*{email}"
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="primaryRole" class="block text-gray-700 text-sm font-bold mb-2">Rôle Principal :</label>
+                        <input type="text" id="primaryRole" th:value="${currentUserRole}" readonly
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200 cursor-not-allowed"/>
+                        <p class="text-xs text-gray-500 mt-1">Les rôles sont gérés par les administrateurs.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Tous les Rôles :</label>
+                        <div class="flex flex-wrap">
+                                <span th:each="role : ${userRoles}" th:text="${role}"
+                                      class="inline-block bg-indigo-100 text-indigo-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded mb-2"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Profil du Fonctionnaire</h3>
+                    <div th:if="${personFullName != null and personFullName != 'Non-lié'}">
+                        <input type="hidden" th:field="${fonctionnaire.id}" /> <div class="mb-4">
+                        <label for="firstName" class="block text-gray-700 text-sm font-bold mb-2">Prénom :</label>
+                        <input type="text" id="firstName" th:field="${fonctionnaire.prenomPersonne}"
+                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                    </div>
+                        <div class="mb-4">
+                            <label for="lastName" class="block text-gray-700 text-sm font-bold mb-2">Nom :</label>
+                            <input type="text" id="lastName" th:field="${fonctionnaire.nomPersonne}"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                        </div>
+                        <div class="mb-4">
+                            <label for="startDate" class="block text-gray-700 text-sm font-bold mb-2">Date de début de service :</label>
+                            <input type="date" id="startDate" th:field="${fonctionnaire.dateDebutService}"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200 cursor-not-allowed" readonly/>
+                            <p class="text-xs text-gray-500 mt-1">La date de début de service ne peut pas être modifiée.</p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Fonctions :</label>
+                            <div class="flex flex-wrap">
+                                    <span th:each="func : ${personFunctions}" th:text="${func}"
+                                          class="inline-block bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded mb-2"></span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Les fonctions sont gérées par les administrateurs.</p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="posteComptable" class="block text-gray-700 text-sm font-bold mb-2">Poste Comptable :</label>
+                            <input type="text" id="posteComptable" th:value="${personPosteIntitule}" readonly
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200 cursor-not-allowed"/>
+                        </div>
+                        <div class="mb-4">
+                            <label for="posteVille" class="block text-gray-700 text-sm font-bold mb-2">Ville du Poste :</label>
+                            <input type="text" id="posteVille" th:value="${personPosteVille}" readonly
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200 cursor-not-allowed"/>
+                        </div>
+                    </div>
+                    <div th:unless="${personFullName != null and personFullName != 'Non-lié'}">
+                        <p class="text-gray-700">Aucun profil de fonctionnaire n'est lié à cet utilisateur.</p>
+                    </div>
+                </div>
+            </div>
+
+                <div class="flex justify-end mt-6">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                        Enregistrer les Modifications
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Changer le Mot de Passe</h2>
+                <p class="text-gray-700 mb-4">Pour des raisons de sécurité, les changements de mot de passe sont gérés séparément.</p>
+                <a th:href="@{/change-password}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                    Changer le Mot de Passe
+                </a>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+</body>
+</html>
